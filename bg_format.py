@@ -4,6 +4,7 @@
 
 # NEED A CASE FOR CHEKING IF FOLDER ALREADY EXISTS [DONE]
 # NEED A CASE FOR OPTIONAL PARTITION SIZE INPUT [DONE]
+# NEED A CASE FOR ADDITIONAL USERS [IN-PROGRESS]
 # Can concat per line into a text file until a limit is reached 
 
 # command runs under the following template:
