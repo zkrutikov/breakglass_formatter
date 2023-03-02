@@ -21,7 +21,7 @@ else:
 hostname = sys.argv[2].upper() # ADM number 
 user_name = " --user " + sys.argv[3].lower() # username
 role = " --role " + sys.argv[4].lower() # ADM role / or revoke
-partition_size = sys.argv[5] # optional partition size
+partition_size = 50
 main_dir = ("./" + hostname) # relative path to temp ADM folder
 text = "" # temp reusable variable
 host_count = 0
@@ -30,8 +30,8 @@ file_count = 1
 if sys.argv[4] == 'revoke': # check if it's a revoke request
     role = " --revoke"
 
-if not sys.argv[5]: # if no partition size is provided
-    partition_size = 50 # set it to a default value
+if sys.argv[5]: # if partition size is provided
+    partition_size = sys.argv[5] # set it instead of the default value
 
 
 filename = open(sys.argv[1], 'r') # open host list file with read permissions
@@ -68,4 +68,4 @@ if (text):
     f.write("./breakglass --limit " + text[:-1] + user_name + role) # concat the BG script
     f.close()
     filename.close()
-    print(str(file_count) + " partitions were created" + "\nFormatting complete")
+print("Formatting complete")
