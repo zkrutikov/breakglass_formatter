@@ -19,10 +19,11 @@ else:
     print("Processing...")
 
 hostname = sys.argv[2].upper() # ADM number 
-user_name = " --user " + sys.argv[3].lower() # username
+adm_username = " --user " + sys.argv[3].lower() # username
+username = os.getlogin()
 role = " --role " + sys.argv[4].lower() # ADM role / or revoke
 partition_size = 50
-main_dir = ("./" + hostname) # relative path to temp ADM folder
+main_dir = ("./" + hostname + "_" + username) # relative path to temp ADM folder
 text = "" # temp reusable variable
 host_count = 0
 file_count = 1
@@ -58,14 +59,14 @@ for line in Lines: # going through each line, one at a time
             host_count = 0 # reset the counter
             fname = hostname + "_" + str(file_count) # file name
             f = open(fname + ".txt", "x") # create new text file for host list 
-            f.write("./breakglass --limit " + text[:-1] + user_name + role) # concat the script inside the file
+            f.write("./breakglass --limit " + text[:-1] + adm_username + role) # concat the script inside the file
             f.close()
 
             text = "" # reset string
             file_count += 1 # incrementing for the naming convention
 if (text):
     f = open(hostname + "_" + str(file_count) + ".txt", "x") # create new text file for host list 
-    f.write("./breakglass --limit " + text[:-1] + user_name + role) # concat the BG script
+    f.write("./breakglass --limit " + text[:-1] + adm_username + role) # concat the BG script
     f.close()
     filename.close()
 print("Formatting complete")
