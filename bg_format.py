@@ -1,73 +1,77 @@
-# NEED A CASE FOR EMPTY LINE [DONE]
-# NEED A CASE FOR WHITE SPACES IN LINE [DONE]
-# NEED A CASE FOR NOT CAPITALIZED LETTER [DONE]
+# Format: <hostname file> <ADM number> <ADM users> <ADM role or revoke> <partition size>
 
-# NEED A CASE FOR CHEKING IF FOLDER ALREADY EXISTS [DONE]
-# NEED A CASE FOR OPTIONAL PARTITION SIZE INPUT [DONE]
-# NEED A CASE FOR ADDITIONAL USERS [IN-PROGRESS]
-# Can concat per line into a text file until a limit is reached 
+# need to work on multiple users
+# what do you do with the folder after the script was executed?
+# 
 
-# command runs under the following template:
-# ./bg_format.py <ADM host list> <ADM number> <username> <role/revoke> <optional partition size>
-# example: host.txt ADM-1234 sandeeps application
+import os, shutil # import libraries
 
-import sys, os, shutil # import libraries
 
-if os.stat(sys.argv[1]).st_size == 0:
-    print("\nTerminating, host list is empty")
-    exit()
+### Variables ###
+adm_hostname = input("Enter host list filename: ") 
+adm_num = input("Enter ADM number: ")
+adm_users = input("Enter usernames: ")
+adm_role = " --" + input("Enter ADM role: ")
+partition = input("Enter preferred partition size: ")
+
+script_user = os.getlogin() # username of the user executing the script
+script_dir = ("./" + adm_num + "_" + script_user) # relative path to the temp ADM folder
+host_count = 0 # host counter
+file_count = 1 # partition counter
+text = "" # temp variable
+
+### Script start conditions check ###   
+if not adm_hostname:
+    print("No host file selected. \nTerminating...")
 else:
     print("Processing...")
-
-hostname = sys.argv[2].upper() # ADM number 
-adm_username = " --user " + sys.argv[3].lower() # username
-username = os.getlogin()
-role = " --role " + sys.argv[4].lower() # ADM role / or revoke
-partition_size = 50
-main_dir = ("./" + hostname + "_" + username) # relative path to temp ADM folder
-text = "" # temp reusable variable
-host_count = 0
-file_count = 1
-
-if sys.argv[4] == 'revoke': # check if it's a revoke request
-    role = " --revoke"
-
-if sys.argv[5]: # if partition size is provided
-    partition_size = sys.argv[5] # set it instead of the default value
-
-
-filename = open(sys.argv[1], 'r') # open host list file with read permissions
-Lines = filename.readlines() # begin reading 
-
-if not os.path.exists(main_dir): # check if folder for the ADM already exists
-    os.makedirs(main_dir) # if not, create one and give it ADM name
-    os.chdir(main_dir) # cd into that directory
+    
+if not partition:
+    adm_partition = 30
 else:
-    shutil.rmtree(main_dir) # if folder with the same ADM number exists, remove it
-    os.makedirs(main_dir) # create one and give it ADM name
-    os.chdir(main_dir) # cd into that directory
+    adm_partition = int(partition)
+
+### Opening the host file ###
  
+hostname = open(adm_hostname, 'r') # open host list file with read permissions
 
-for line in Lines: # going through each line, one at a time
+### Creating temp folder ###
+    
+if not os.path.exists(script_dir): # check if folder for the ADM already exists
+    os.makedirs(script_dir) # if not, create one and give it ADM name
+    os.chdir(script_dir) # cd into that directory
+else:
+    shutil.rmtree(script_dir) # if folder with the same ADM number exists, remove it
+    os.makedirs(script_dir) # create one and give it ADM name
+    os.chdir(script_dir) # cd into that directory
 
+### Iterating through the host file ###
+       
+host_list = hostname.readlines() # begin reading the lines 
+
+for line in host_list:
     if (line != "\n"): # check if line is empty
         host_count += 1 # increment host count
         line = line.replace(" ", "").upper() # trim space and format to upper case
         text = text+line.strip()+"," # for every line, concatenate a comma 
 
-        if host_count == int(partition_size): # if threshold reached, write out to file and reset host_counter and increment file_counter
+        if host_count == int(adm_partition): # if threshold reached, write out to file and reset host_counter and increment file_counter
 
             host_count = 0 # reset the counter
-            fname = hostname + "_" + str(file_count) # file name
-            f = open(fname + ".txt", "x") # create new text file for host list 
-            f.write("./breakglass --limit " + text[:-1] + adm_username + role) # concat the script inside the file
+            f = open(adm_num + "_" + str(file_count) + ".txt", "x") 
+            f.write("./breakglass --limit " + text[:-1] + adm_users + adm_role) # concat the script inside the file
             f.close()
 
             text = "" # reset string
             file_count += 1 # incrementing for the naming convention
 if (text):
-    f = open(hostname + "_" + str(file_count) + ".txt", "x") # create new text file for host list 
-    f.write("./breakglass --limit " + text[:-1] + adm_username + role) # concat the BG script
+    f = open(adm_num + "_" + str(file_count) + ".txt", "x") # create new text file for host list 
+    f.write("./breakglass --limit " + text[:-1] + adm_users + adm_role) # concat the BG script
     f.close()
-    filename.close()
+
+hostname.close()
+
 print("Formatting complete")
+
+
+    
