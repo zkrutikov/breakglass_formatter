@@ -1,13 +1,15 @@
 # Format: <hostname file> <ADM number> <ADM users> <ADM role or revoke> <partition size>
 
-# need to work on multiple users
-# what do you do with the folder after the script was executed?
-# 
+# Need to work on multiple users.
+# What do you do with the folder after the script was executed? Maybe create only one txt file with partitions separated
+# in paragraphs? Also this file can be emailed to the user for conveniece?
+# Need to check how openning excel files is different from txt files.
 
 import os, shutil # import libraries
 
 
 ### Variables ###
+
 adm_hostname = input("Enter host list filename: ") 
 adm_num = input("Enter ADM number: ")
 adm_users = input("Enter usernames: ")
@@ -18,9 +20,10 @@ script_user = os.getlogin() # username of the user executing the script
 script_dir = ("./" + adm_num + "_" + script_user) # relative path to the temp ADM folder
 host_count = 0 # host counter
 file_count = 1 # partition counter
-text = "" # temp variable
+text = "" # temp string variable
 
 ### Script start conditions check ###   
+
 if not adm_hostname:
     print("No host file selected. \nTerminating...")
 else:
@@ -62,8 +65,8 @@ for line in host_list:
             f.write("./breakglass --limit " + text[:-1] + adm_users + adm_role) # concat the script inside the file
             f.close()
 
-            text = "" # reset string
-            file_count += 1 # incrementing for the naming convention
+            text = "" # reset temp string
+            file_count += 1 # incrementing for partition naming convention
 if (text):
     f = open(adm_num + "_" + str(file_count) + ".txt", "x") # create new text file for host list 
     f.write("./breakglass --limit " + text[:-1] + adm_users + adm_role) # concat the BG script
@@ -71,7 +74,7 @@ if (text):
 
 hostname.close()
 
-print("Formatting complete")
+print(str(file_count - 1) + " partitions were created \nFormatting complete")
 
 
     
