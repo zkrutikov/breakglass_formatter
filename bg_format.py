@@ -56,7 +56,7 @@ for line in host_list:
     if (line != "\n"): # check if line is empty
         host_count += 1 # increment host count
         line = line.replace(" ", "").upper() # trim space and format to upper case
-        text = text+line.strip()+"," # for every line, concatenate a comma 
+        text = text+line.strip()+"," # for every host, concatenate a comma 
 
         if host_count == int(adm_partition): # if threshold reached, write out to file and reset host_counter and increment file_counter
 
